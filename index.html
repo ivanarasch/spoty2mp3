@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpotyToMp3 - By Ivana</title>
+    <style>
+        /* Body Background */
+        body {
+            background-color: rgb(232, 12, 224);
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Hearts and Stars as background elements */
+        .shape {
+            position: absolute;
+            font-size: 80px;
+            color: #c800ff;
+            animation: move 10s infinite linear;
+        }
+
+        .shape:nth-child(4n+1) {
+            color: #2bff00; /* Green */
+            content: '★';
+        }
+
+        .shape:nth-child(4n+2) {
+            color: #5a0080; /* Dark Purple */
+            content: '❤';
+        }
+
+        .shape:nth-child(4n+3) {
+            color: #00eeff; /* Hot Pink */
+            content: '★';
+        }
+
+        .shape:nth-child(4n) {
+            color: #7700ff; /* Purple */
+            content: '❤';
+        }
+
+        /* Animation to move shapes randomly */
+        @keyframes move {
+            0% {
+                transform: translate(0, 0);
+            }
+            25% {
+                transform: translate(200px, -200px);
+            }
+            50% {
+                transform: translate(-300px, 200px);
+            }
+            75% {
+                transform: translate(300px, -300px);
+            }
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+
+        /* Glitch Text Effect with Coding Font */
+        .glitch {
+            font-family: 'Courier New', monospace;
+            font-size: 3em;
+            position: relative;
+            display: inline-block;
+            color: #5eff00;
+        }
+
+        .glitch:before {
+            content: "SPOTY TO MP3";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: #40ff00;
+            width: 100%;
+            left: 2px;
+            text-shadow: -1px 0 #ff00e1, 1px 0 #7700ff;
+            animation: glitch 1s infinite linear;
+            clip: rect(0, 900px, 0, 0);
+        }
+
+        /* Retro Flickering Animation */
+        @keyframes flicker {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .flicker-text {
+            animation: flicker 1.5s infinite;
+        }
+
+        /* Input and Button Styling */
+        input[type="text"] {
+            background-color: #000000;
+            border: 2px solid #2bff00;
+            border-radius: 5px;
+            color: white;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            padding: 10px;
+            width: 300px;
+            text-align: center;
+            transition: all 0.3s ease-in-out;
+        }
+
+        input[type="text"]:focus {
+            border-color: #79f024;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+        }
+
+        button {
+            background-color: #2bff00;
+            border: none;
+            border-radius: 5px;
+            color: rgb(255, 255, 255);
+            font-size: 1.5em;
+            padding: 15px 30px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #ea00ff;
+            color: black;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(179, 0, 255, 0.6);
+        }
+
+        footer {
+            margin-top: 50px;
+            font-size: 1em;
+            color: white;
+        }
+
+        footer .signature {
+            font-size: 0.6em;
+            color: #2bff00;
+        }
+
+        #content {
+            display: none;
+        }
+
+        #passkey-section {
+            display: block;
+        }
+
+        .vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script>
+        function checkPasskey() {
+            const passkey = document.getElementById('passkey').value;
+            if (passkey === 'Plunderphonics25!') {
+                document.getElementById('content').style.display = 'block';
+                document.getElementById('passkey-section').style.display = 'none';
+            } else {
+                alert('Incorrect passkey!');
+            }
+        }
+        function startDownload() {
+            const playlistId = document.getElementById('playlist_id').value;
+            const folderName = document.getElementById('folder_name').value;
+
+            fetch('/process', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ playlist_id: playlistId, folder_name: folderName })
+            })
+            .then(response => response.text())
+            .then(message => {
+                document.getElementById('status').innerText = message;
+            });
+
+            // Poll progress every second
+            const interval = setInterval(() => {
+                fetch('/progress')
+                    .then(response => response.text())
+                    .then(progress => {
+                        document.getElementById('progress-bar').value = progress;
+                        if (progress === "100") {
+                            clearInterval(interval);
+                        }
+                    });
+            }, 1000);
+        }
+
+
+        
+    </script>
+</head>
+<body>
+    <!-- Hearts and Stars Background -->
+    <div class="shape" style="top: 10%; left: 10%;">❤</div>
+    <div class="shape" style="top: 20%; left: 30%;">★</div>
+    <div class="shape" style="top: 50%; left: 50%;">❤</div>
+    <div class="shape" style="top: 70%; left: 70%;">★</div>
+    <div class="shape" style="top: 80%; left: 20%;">❤</div>
+    <div class="shape" style="top: 10%; left: 80%;">★</div>
+    <div class="shape" style="top: 40%; left: 60%;">❤</div>
+    <div class="shape" style="top: 60%; left: 10%;">★</div>
+    <div class="shape" style="top: 30%; left: 40%;">❤</div>
+    <div class="shape" style="top: 90%; left: 90%;">★</div>
+
+    <div id="passkey-section">
+        <h1 class="glitch flicker-text">ENTER PASSKEY</h1>
+        <div class="vertical">
+            <input type="text" id="passkey" placeholder="Enter Passkey...">
+            <button onclick="checkPasskey()">Unlock</button>
+        </div>
+    </div>
+
+    <div id="content">
+        <h1 class="glitch flicker-text">SPOTY TO MP3</h1>
+
+        <form action="/process" method="POST">
+            <label for="playlist_id">Spotify Playlist Link:</label><br>
+            <input type="text" id="playlist_id" name="playlist_id" placeholder="Enter Spotify Playlist Link..." required><br><br>
+            
+            <label for="folder_name"> Name Your MP3 Folder!</label><br>
+            <input type="text" id="folder_name" name="folder_name" placeholder="Enter Folder Name..." required><br><br>
+
+            <button type="submit">Submit</button>
+        </form>
+
+        <footer>
+                <p>Just give it a few minutes to download. A pop-up will show you where it’s saved when it’s done! </p>
+            <p>Made with <span style="color: #000000;">❤</span> by <span class="signature">Ivana</span></p>
+        </footer>
+    </div>
+    
+    
+    <div id="progress-section" style="display: none;">
+        <progress id="progress-bar" value="0" max="100" style="width: 100%;"></progress>
+        <p id="completion-message" style="display: none; color: green;">Download Complete!</p>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
